@@ -18,6 +18,14 @@ class AttendanceControllers{
             res.status(500).json({message:"Error in opration"});
         }
     }
+    getByFilter = async (req,res)=>{
+        try {
+            const filter = await attendanceServices.getFilter(req.query);
+            return res.status(200).json(filter);
+        } catch (error) {
+             res.status(500).json({message:"Error in opration"});
+        }
+    }
     getSingleAttendance = async(req,res)=>{
         try {
             const data = await attendanceServices.getSingle(req.params.id);
