@@ -1,137 +1,80 @@
 import { useState } from "react";
 
-import {
-    register,
-    login,
-    profile
-}
-from "../services/auth.services";
+import { register, login, profile } from "../services/auth.services";
 
+const useAuth = () => {
+  const [user, setUser] = useState(null);
 
-const useAuth = ()=>{
+  const [loading, setLoading] = useState(false);
 
-const [user,setUser] =
-useState(null);
+  const [error, setError] = useState(null);
 
-const [loading,setLoading] =
-useState(false);
+  // Register
+  const handleRegister = async (data) => {
+    try {
+      setLoading(true);
 
-const [error,setError] =
-useState(null);
+      const response = await register(data);
 
+      return response;
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-// Register
-const handleRegister =
-async(data)=>{
+  // Login
+  const handleLogin = async (data) => {
+    try {
+      setLoading(true);
 
-try{
+      const response = await login(data);
 
-setLoading(true);
+      if (response.token) {
+        localStorage.setItem("token", response.token);
+      }
 
-const response =
-await register(data);
+      return response;
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-return response;
+  // Profile
+  const getProfile = async () => {
+    try {
+      setLoading(true);
 
-}catch(error){
+      const data = await profile();
 
-setError(error.message);
+      setUser(data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-}finally{
+  // Logout
+  const logout = () => {
+    localStorage.removeItem("token");
 
-setLoading(false);
+    setUser(null);
+  };
 
-}
+  return {
+    user,
+    loading,
+    error,
 
-};
-
-
-// Login
-const handleLogin =
-async(data)=>{
-
-try{
-
-setLoading(true);
-
-const response =
-await login(data);
-
-if(response.token){
-
-localStorage.setItem(
-"token",
-response.token
-);
-
-}
-
-return response;
-
-}catch(error){
-
-setError(error.message);
-
-}finally{
-
-setLoading(false);
-
-}
-
-};
-
-
-// Profile
-const getProfile =
-async()=>{
-
-try{
-
-setLoading(true);
-
-const data =
-await profile();
-
-setUser(data);
-
-}catch(error){
-
-setError(error.message);
-
-}finally{
-
-setLoading(false);
-
-}
-
-};
-
-
-// Logout
-const logout = ()=>{
-
-localStorage.removeItem(
-"token"
-);
-
-setUser(null);
-
-};
-
-
-return{
-
-user,
-loading,
-error,
-
-handleRegister,
-handleLogin,
-getProfile,
-logout
-
-};
-
+    handleRegister,
+    handleLogin,
+    getProfile,
+    logout,
+  };
 };
 
 export default useAuth;
